@@ -1,15 +1,20 @@
+import os
 from flask import Flask, request
 import requests
 
 app = Flask(__name__)
 
 # Configurações do WhatsApp
-WHATSAPP_API_URL = "https://graph.facebook.com/v17.0/<YOUR_PHONE_NUMBER_ID>/messages"  # Substitua <YOUR_PHONE_NUMBER_ID> pelo ID do seu número
-WHATSAPP_TOKEN = "EAAIk4wzgVRsBO0FzYmOpLKxenDXk3q90FlkZAZBZAtgh6p2W2XtoqIknnQvz6U9G3stUKySoZAR64JZAXYh9Bp3xVkSzeM5Uo0Fo2bGE63ZCW8zrc9gfwDtCT3YxPiGee4TZBkUVYowB01kOUGjyvzkfpvXp7QSPNOReZAjfnXRTCopfUyLIzsMS17eSZCqnWVvmARiIs3DeEHBxZB2bBjG2xqfSnmGK5fdEydxfVofQ6mTPYZD"
+WHATSAPP_API_URL = "https://graph.facebook.com/v17.0/577247788797672/messages"  # ID do número de telefone correto
+WHATSAPP_TOKEN = "EAAIk4wzgVRsBO6wkxWn8g7xjZBWbKdNuYQrI77TLQJ1tsxBD9OP5Te9zZBtfzqaGCSEv8bbjKjEJgoTigFMhmjhiGZBZBwX67YZCRPaLzsMjPRZCBoACqcih8SPQ84jQ25MDKPM3L0Lpkr7wqL1r6LpoaWEnzD3Q5t7SZCZClZCNhZBRraMLzUjLvQkNrZBEoI3aUf6dG0l9YhKoeJwNGDDMZCXJaYtxV2RfVgZBfKnVk3jGDfGUZD"
 
 # Configuração do GPT Personalizado
 GPT_API_URL = "https://api.openai.com/v1/chat/completions"
 GPT_API_KEY = "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"
+
+@app.route("/")
+def index():
+    return "Bot está funcionando!"
 
 @app.route("/webhook", methods=["POST"])
 def webhook():
@@ -26,7 +31,7 @@ def webhook():
             "Authorization": f"Bearer {GPT_API_KEY}"
         }
         payload = {
-            "model": "gpt-4",  # Certifique-se de usar o modelo correto configurado
+            "model": "gpt-4",  # Certifique-se de usar o modelo configurado no GPT
             "messages": [{"role": "user", "content": user_message}],
         }
         response = requests.post(GPT_API_URL, headers=headers, json=payload)
@@ -50,4 +55,5 @@ def webhook():
     return "OK", 200
 
 if __name__ == "__main__":
-    app.run(port=5000)
+    port = int(os.getenv("PORT", 5000))  # Porta esperada pelo Railway
+    app.run(host="0.0.0.0", port=port)
